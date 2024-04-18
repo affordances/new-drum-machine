@@ -1,15 +1,13 @@
-import DrumMachine from "../components/DrumMachine";
+import dynamic from "next/dynamic";
 
-// import dynamic from "next/dynamic";
-
-// const NoSSRComponent = dynamic(() => import("./App"), {
-//   ssr: false,
-// });
+const NoSSRComponent = dynamic(() => import("../components/DrumMachine"), {
+  ssr: false,
+});
 
 export const metadata = {
   title: "Drum Machine",
 };
 
 export default function Home() {
-  return <DrumMachine />;
+  return <NoSSRComponent />;
 }

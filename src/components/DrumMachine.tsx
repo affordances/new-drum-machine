@@ -10,7 +10,7 @@ import {
   GRID_HEIGHT,
   GRID_WIDTH,
   INSTRUMENT_NAMES,
-} from "../app/constants";
+} from "../lib/constants";
 import { beatHeight, getStartCoords } from "../lib/helpers";
 import { useDrumMachine } from "../hooks/hooks";
 import * as S from "../styles/styles";

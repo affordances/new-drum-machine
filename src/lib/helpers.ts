@@ -1,6 +1,6 @@
 import { KonvaEventObject } from "konva/lib/Node";
 
-import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "../app/constants";
+import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "./constants";
 import { Nil } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;

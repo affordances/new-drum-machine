@@ -6,7 +6,7 @@ import {
   INSTRUMENT_NAMES,
   SOUND_PATHS,
   gridOptions,
-} from "../app/constants";
+} from "../lib/constants";
 import { Beat, GridOption, StartCoords } from "../types/types";
 
 const usePreviousTransportPos = (pos: number) => {
