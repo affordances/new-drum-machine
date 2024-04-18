@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import * as K from "react-konva";
 import Select from "react-select";
