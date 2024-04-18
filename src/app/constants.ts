@@ -1,14 +1,14 @@
-import { GridOption, SoundPathsType } from "./types";
+import { GridOption, SoundPathsType } from "../types/types";
 
 export const GRID_WIDTH: number = 768;
 export const GRID_HEIGHT: number = 192;
 // export const MAX_SUBDIVISIONS: number = 192;
 
 export const SOUND_PATHS: SoundPathsType = {
-  OH: "/drum-machine/assets/ohh.wav",
-  CH: "/drum-machine/assets/chh.wav",
-  S: "/drum-machine/assets/sd.wav",
-  K: "/drum-machine/assets/kick.wav",
+  OH: "/drum-machine/samples/ohh.wav",
+  CH: "/drum-machine/samples/chh.wav",
+  S: "/drum-machine/samples/sd.wav",
+  K: "/drum-machine/samples/kick.wav",
 };
 
 export const INSTRUMENT_NAMES: Array<string> = Object.keys(SOUND_PATHS);

@@ -6,8 +6,8 @@ import {
   INSTRUMENT_NAMES,
   SOUND_PATHS,
   gridOptions,
-} from "./constants";
-import { Beat, GridOption, StartCoords } from "./types";
+} from "../app/constants";
+import { Beat, GridOption, StartCoords } from "../types/types";
 
 const usePreviousTransportPos = (pos: number) => {
   const ref = React.useRef<number>(1); // so it doesn't initialize as null, will get reset immediately anyway

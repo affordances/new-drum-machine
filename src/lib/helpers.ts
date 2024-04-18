@@ -1,7 +1,7 @@
 import { KonvaEventObject } from "konva/lib/Node";
 
-import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "./constants";
-import { Nil } from "./types";
+import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "../app/constants";
+import { Nil } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
 const isUndefined = (x: unknown): x is undefined => x === undefined;

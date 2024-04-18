@@ -10,13 +10,13 @@ import {
   GRID_HEIGHT,
   GRID_WIDTH,
   INSTRUMENT_NAMES,
-} from "./constants";
-import { beatHeight, getStartCoords } from "./helpers";
-import { useDrumMachine } from "./hooks";
-import * as S from "./styles";
-import { GridOption } from "./types";
+} from "../app/constants";
+import { beatHeight, getStartCoords } from "../lib/helpers";
+import { useDrumMachine } from "../hooks/hooks";
+import * as S from "../styles/styles";
+import { GridOption } from "../types/types";
 
-export const App = () => {
+export const DrumMachine = () => {
   const [cursorIsPointer, setCursorIsPointer] = React.useState<boolean>(false);
 
   const {
@@ -223,4 +223,4 @@ export const App = () => {
   );
 };
 
-export default App;
+export default DrumMachine;

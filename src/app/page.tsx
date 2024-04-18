@@ -1,4 +1,4 @@
-import App from "./App";
+import DrumMachine from "../components/DrumMachine";
 
 // import dynamic from "next/dynamic";
 
@@ -6,6 +6,10 @@ import App from "./App";
 //   ssr: false,
 // });
 
+export const metadata = {
+  title: "Drum Machine",
+};
+
 export default function Home() {
-  return <App />;
+  return <DrumMachine />;
 }
