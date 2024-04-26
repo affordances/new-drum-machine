@@ -1,4 +1,5 @@
 import React from "react";
+import * as Tone from "tone/build/esm/index";
 
 import {
   GRID_HEIGHT,
@@ -8,6 +9,7 @@ import {
   gridOptions,
 } from "../lib/constants";
 import { Beat, GridOption, StartCoords } from "../types/types";
+import { samples } from "@/lib/helpers";
 
 const usePreviousTransportPos = (pos: number) => {
   const ref = React.useRef<number>(1); // so it doesn't initialize as null, will get reset immediately anyway
@@ -17,37 +19,15 @@ const usePreviousTransportPos = (pos: number) => {
   return ref.current;
 };
 
-export const useDrumMachine = () => {
-  const [buffers, setBuffers] = React.useState<{ [name: string]: AudioBuffer }>(
-    {}
-  );
+export const useDrumMachine = (
+  sequenceRef: React.MutableRefObject<Tone.Sequence<any> | null>
+) => {
   const [transportPos, setTransportPos] = React.useState<number>(0);
   const [isPlaying, setIsPlaying] = React.useState<boolean>(false);
   const [beats, setBeats] = React.useState<Array<Beat>>([]);
   const [tempo, setTempo] = React.useState<number>(90);
   const [startTime, setStartTime] = React.useState<number | null>(null);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
-
-  const audioContextRef = React.useRef(new AudioContext());
-
-  React.useEffect(() => {
-    const loadSamples = async () => {
-      const bufferMap: { [name: string]: AudioBuffer } = {};
-
-      for (const [name, url] of Object.entries(SOUND_PATHS)) {
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = await audioContextRef.current.decodeAudioData(
-          arrayBuffer
-        );
-        bufferMap[name] = buffer;
-      }
-
-      setBuffers(bufferMap);
-    };
-
-    loadSamples();
-  }, [audioContextRef]);
 
   const prevTransportPos = usePreviousTransportPos(transportPos);
 
@@ -87,26 +67,48 @@ export const useDrumMachine = () => {
   };
 
   const handleTogglePlaying = React.useCallback(() => {
-    setIsPlaying((staleIsPlaying) => !staleIsPlaying);
+    const togglePlay = async () => {
+      if (Tone.context.state !== "running") {
+        await Tone.start();
+      }
+
+      Tone.Transport.bpm.value = tempo;
+
+      setIsPlaying((prevIsPlaying) => {
+        if (!prevIsPlaying) {
+          Tone.Transport.start();
+        } else {
+          Tone.Transport.stop();
+
+          // samples.forEach((sample) => {
+          //   sample.sampler.triggerAttackRelease("C2", Tone.now());
+          // });
+        }
+        return !prevIsPlaying;
+      });
+    };
+
+    togglePlay();
+
     setStartTime(performance.now());
   }, []);
 
-  const spacebarListener = React.useCallback(
-    (e: { key: string }) => {
-      if (e.key === " ") {
-        handleTogglePlaying();
-      }
-    },
-    [handleTogglePlaying]
-  );
+  // const spacebarListener = React.useCallback(
+  //   (e: { key: string }) => {
+  //     if (e.key === " ") {
+  //       handleTogglePlaying();
+  //     }
+  //   },
+  //   [handleTogglePlaying]
+  // );
 
-  React.useEffect(() => {
-    window.addEventListener("keydown", spacebarListener);
+  // React.useEffect(() => {
+  //   window.addEventListener("keydown", spacebarListener);
 
-    return () => {
-      window.removeEventListener("keydown", spacebarListener);
-    };
-  }, [spacebarListener]);
+  //   return () => {
+  //     window.removeEventListener("keydown", spacebarListener);
+  //   };
+  // }, [spacebarListener]);
 
   React.useEffect(() => {
     if (isPlaying) {
@@ -117,24 +119,24 @@ export const useDrumMachine = () => {
             beat.startCoords.x <= transportPos
       );
 
-      beatsToPlay.forEach((beat) => {
-        const name =
-          INSTRUMENT_NAMES[
-            INSTRUMENT_NAMES.length * (beat.startCoords.y / GRID_HEIGHT)
-          ];
+      // beatsToPlay.forEach((beat) => {
+      // const name =
+      //   INSTRUMENT_NAMES[
+      //     INSTRUMENT_NAMES.length * (beat.startCoords.y / GRID_HEIGHT)
+      //   ];
 
-        const buffer = buffers[name];
+      // samples.forEach((sample) => {
+      //   sample.sampler.triggerAttack("C2", Tone.now());
+      // });
+      // });
 
-        if (buffer) {
-          console.log(buffer);
-          const source = audioContextRef.current.createBufferSource();
-          source.buffer = buffer;
-          source.connect(audioContextRef.current.destination);
-          source.start();
-        }
-      });
+      sequenceRef.current = new Tone.Sequence().start();
+
+      return () => {
+        sequenceRef.current?.dispose();
+      };
     }
-  }, [isPlaying, prevTransportPos, beats, transportPos, buffers]);
+  }, [isPlaying, prevTransportPos, beats, transportPos, sequenceRef]);
 
   React.useLayoutEffect(() => {
     if (isPlaying && startTime) {
@@ -165,7 +167,6 @@ export const useDrumMachine = () => {
 
   return {
     beats,
-    buffers,
     gridView,
     handleAddBeat,
     handleDeleteBeat,

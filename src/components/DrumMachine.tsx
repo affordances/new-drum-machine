@@ -4,6 +4,7 @@ import React from "react";
 import * as K from "react-konva";
 import Select from "react-select";
 import { v4 as uuidv4 } from "uuid";
+import * as Tone from "tone/build/esm/index";
 
 import {
   gridOptions,
@@ -17,7 +18,11 @@ import * as S from "../styles/styles";
 import { GridOption } from "../types/types";
 
 export const DrumMachine = () => {
-  const [cursorIsPointer, setCursorIsPointer] = React.useState<boolean>(false);
+  const [cursorIsPointer, setCursorIsPointer] = React.useState(false);
+  const [isLoaded, setLoaded] = React.useState(false);
+
+  const sequenceRef = React.useRef<Tone.Sequence | null>(null);
+  const samplerRef = React.useRef<Tone.Sampler | null>(null);
 
   const {
     beats,
@@ -31,10 +36,42 @@ export const DrumMachine = () => {
     setGridView,
     tempo,
     transportPos,
-  } = useDrumMachine();
+  } = useDrumMachine(sequenceRef);
 
   const subdivisions = gridView.value;
   const currentBeatWidth = GRID_WIDTH / subdivisions;
+
+  React.useEffect(() => {
+    samplerRef.current = new Tone.Sampler({
+      urls: {
+        ["A1"]: "kick.wav",
+        ["B1"]: "chh.wav",
+        ["C1"]: "ohh.wav",
+        ["D1"]: "sd.wav",
+      },
+      baseUrl: "/samples/",
+      onload: () => {
+        setLoaded(true);
+      },
+    }).toDestination();
+  }, []);
+
+  React.useEffect(() => {
+    const sequence = new Tone.Sequence(
+      (time, note) => {
+        samplerRef.current?.triggerAttackRelease(note, 0.5, time);
+      },
+      ["A1", "B1", "C1", "D1"],
+      "4n"
+    ).start(0);
+
+    sequenceRef.current = sequence;
+
+    return () => {
+      sequence.stop();
+      sequence.dispose();
+    };
+  }, []);
 
   return (
     <S.Container>
@@ -199,7 +236,7 @@ export const DrumMachine = () => {
         </K.Layer>
       </K.Stage>
       <S.MenuContainer>
-        <S.Button onClick={handleTogglePlaying}>
+        <S.Button disabled={!isLoaded} onClick={handleTogglePlaying}>
           {isPlaying ? "Stop" : "Play"}
         </S.Button>
         <S.Tempo>{tempo}</S.Tempo>

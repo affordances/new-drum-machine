@@ -1,17 +1,17 @@
-import { GridOption, SoundPathsType } from "../types/types";
+import { GridOption, SampleData } from "../types/types";
 
 export const GRID_WIDTH: number = 768;
 export const GRID_HEIGHT: number = 192;
 // export const MAX_SUBDIVISIONS: number = 192;
 
-export const SOUND_PATHS: SoundPathsType = {
-  OH: "/samples/ohh.wav",
-  CH: "/samples/chh.wav",
-  S: "/samples/sd.wav",
-  K: "/samples/kick.wav",
-};
+export const SOUND_PATHS: Array<SampleData> = [
+  { name: "OH", url: "ohh.wav" },
+  { name: "CH", url: "chh.wav" },
+  { name: "S", url: "sd.wav" },
+  { name: "K", url: "kick.wav" },
+];
 
-export const INSTRUMENT_NAMES: Array<string> = Object.keys(SOUND_PATHS);
+export const INSTRUMENT_NAMES: Array<string> = SOUND_PATHS.map((p) => p.name);
 
 export const gridOptions: Array<GridOption> = [
   { value: 4, label: "1/4 Note" },

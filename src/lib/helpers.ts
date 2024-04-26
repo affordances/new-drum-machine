@@ -1,7 +1,13 @@
 import { KonvaEventObject } from "konva/lib/Node";
+import * as Tone from "tone/build/esm/index";
 
-import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "./constants";
-import { Nil } from "../types/types";
+import {
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  INSTRUMENT_NAMES,
+  SOUND_PATHS,
+} from "./constants";
+import { Nil, Sample, SampleData } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
 const isUndefined = (x: unknown): x is undefined => x === undefined;
@@ -29,3 +35,23 @@ export const getStartCoords = (
   const y = getYStartCoordinate(e.evt.clientY - 24, GRID_HEIGHT);
   return { x, y };
 };
+
+export const createSamples = (samples: SampleData[]) => {
+  return samples.map((sample, id) => {
+    const sampler = new Tone.Sampler({
+      urls: {
+        ["C2"]: sample.url,
+      },
+      baseUrl: "/samples/",
+    });
+
+    return {
+      id: id,
+      name: sample.name,
+      url: sample.url,
+      sampler: sampler,
+    };
+  });
+};
+
+export const samples: Sample[] = createSamples(SOUND_PATHS);
