@@ -19,7 +19,6 @@ import { GridOption } from "../types/types";
 
 export const DrumMachine = () => {
   const [cursorIsPointer, setCursorIsPointer] = React.useState(false);
-  const [isLoaded, setLoaded] = React.useState(false);
 
   const sequenceRef = React.useRef<Tone.Sequence | null>(null);
   const samplerRef = React.useRef<Tone.Sampler | null>(null);
@@ -31,47 +30,16 @@ export const DrumMachine = () => {
     handleDeleteBeat,
     handleTogglePlaying,
     handleUpdateStartCoords,
+    isLoaded,
     isPlaying,
     onChangeTempo,
     setGridView,
     tempo,
     transportPos,
-  } = useDrumMachine(sequenceRef);
+  } = useDrumMachine(sequenceRef, samplerRef);
 
   const subdivisions = gridView.value;
   const currentBeatWidth = GRID_WIDTH / subdivisions;
-
-  React.useEffect(() => {
-    samplerRef.current = new Tone.Sampler({
-      urls: {
-        ["A1"]: "kick.wav",
-        ["B1"]: "chh.wav",
-        ["C1"]: "ohh.wav",
-        ["D1"]: "sd.wav",
-      },
-      baseUrl: "/samples/",
-      onload: () => {
-        setLoaded(true);
-      },
-    }).toDestination();
-  }, []);
-
-  React.useEffect(() => {
-    const sequence = new Tone.Sequence(
-      (time, note) => {
-        samplerRef.current?.triggerAttackRelease(note, 0.5, time);
-      },
-      ["A1", "B1", "C1", "D1"],
-      "4n"
-    ).start(0);
-
-    sequenceRef.current = sequence;
-
-    return () => {
-      sequence.stop();
-      sequence.dispose();
-    };
-  }, []);
 
   return (
     <S.Container>

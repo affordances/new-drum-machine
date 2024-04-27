@@ -35,23 +35,3 @@ export const getStartCoords = (
   const y = getYStartCoordinate(e.evt.clientY - 24, GRID_HEIGHT);
   return { x, y };
 };
-
-export const createSamples = (samples: SampleData[]) => {
-  return samples.map((sample, id) => {
-    const sampler = new Tone.Sampler({
-      urls: {
-        ["C2"]: sample.url,
-      },
-      baseUrl: "/samples/",
-    });
-
-    return {
-      id: id,
-      name: sample.name,
-      url: sample.url,
-      sampler: sampler,
-    };
-  });
-};
-
-export const samples: Sample[] = createSamples(SOUND_PATHS);
