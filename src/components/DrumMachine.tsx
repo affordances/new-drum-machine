@@ -15,13 +15,13 @@ import {
 import { beatHeight, getStartCoords } from "../lib/helpers";
 import { useDrumMachine } from "../hooks/hooks";
 import * as S from "../styles/styles";
-import { GridOption } from "../types/types";
+import { GridOption, Players } from "../types/types";
 
 export const DrumMachine = () => {
   const [cursorIsPointer, setCursorIsPointer] = React.useState(false);
 
   const sequenceRef = React.useRef<Tone.Sequence | null>(null);
-  const samplerRef = React.useRef<Tone.Sampler | null>(null);
+  const playersRef = React.useRef<Players | null>(null);
 
   const {
     beats,
@@ -30,16 +30,18 @@ export const DrumMachine = () => {
     handleDeleteBeat,
     handleTogglePlaying,
     handleUpdateStartCoords,
-    isLoaded,
+    playersAreLoading,
     isPlaying,
     onChangeTempo,
     setGridView,
     tempo,
-    transportPos,
-  } = useDrumMachine(sequenceRef, samplerRef);
+    // transportPos,
+  } = useDrumMachine(sequenceRef, playersRef);
 
   const subdivisions = gridView.value;
   const currentBeatWidth = GRID_WIDTH / subdivisions;
+
+  console.log(beats);
 
   return (
     <S.Container>
@@ -194,17 +196,17 @@ export const DrumMachine = () => {
               </K.Group>
             );
           })}
-          {isPlaying && (
+          {/* {isPlaying && (
             <K.Line
               points={[transportPos, 0, transportPos, GRID_HEIGHT]}
               strokeWidth={2}
               stroke="red"
             />
-          )}
+          )} */}
         </K.Layer>
       </K.Stage>
       <S.MenuContainer>
-        <S.Button disabled={!isLoaded} onClick={handleTogglePlaying}>
+        <S.Button disabled={playersAreLoading} onClick={handleTogglePlaying}>
           {isPlaying ? "Stop" : "Play"}
         </S.Button>
         <S.Tempo>{tempo}</S.Tempo>

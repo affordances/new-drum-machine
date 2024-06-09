@@ -1,13 +1,7 @@
 import { KonvaEventObject } from "konva/lib/Node";
-import * as Tone from "tone/build/esm/index";
 
-import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  INSTRUMENT_NAMES,
-  SOUND_PATHS,
-} from "./constants";
-import { Nil, Sample, SampleData } from "../types/types";
+import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "./constants";
+import { Nil, NoteStates, Urls } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
 const isUndefined = (x: unknown): x is undefined => x === undefined;
@@ -34,4 +28,28 @@ export const getStartCoords = (
   const x = getXStartCoordinate(GRID_WIDTH, e.evt.clientX - 24, subdivisions);
   const y = getYStartCoordinate(e.evt.clientY - 24, GRID_HEIGHT);
   return { x, y };
+};
+
+export const createNoteStates = (steps: number, drumUrls: Urls) => {
+  const createFalseArray = (): boolean[] => new Array(steps).fill(false);
+
+  const createKickArray = (): boolean[] => {
+    const arr = new Array(steps).fill(false);
+    [0, 4, 8, 12].forEach((index) => {
+      arr[index] = true;
+    });
+    return arr;
+  };
+
+  const newNoteStates: NoteStates = {};
+
+  for (const d of drumUrls) {
+    if (d.name === "kick") {
+      newNoteStates[d.name] = createKickArray();
+    } else {
+      newNoteStates[d.name] = createFalseArray();
+    }
+  }
+
+  return newNoteStates;
 };

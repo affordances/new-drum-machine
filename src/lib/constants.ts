@@ -1,14 +1,16 @@
-import { GridOption, SampleData } from "../types/types";
+import { GridOption, Urls } from "../types/types";
+
+export const steps = 16;
 
 export const GRID_WIDTH: number = 768;
 export const GRID_HEIGHT: number = 192;
 // export const MAX_SUBDIVISIONS: number = 192;
 
-export const SOUND_PATHS: Array<SampleData> = [
-  { name: "OH", url: "ohh.wav" },
-  { name: "CH", url: "chh.wav" },
-  { name: "S", url: "sd.wav" },
-  { name: "K", url: "kick.wav" },
+export const SOUND_PATHS: Urls = [
+  { name: "open hat", url: "./samples/ohh.wav" },
+  { name: "closed hat", url: "./samples/chh.wav" },
+  { name: "snare", url: "./samples/sd.wav" },
+  { name: "kick", url: "./samples/kick.wav" },
 ];
 
 export const INSTRUMENT_NAMES: Array<string> = SOUND_PATHS.map((p) => p.name);

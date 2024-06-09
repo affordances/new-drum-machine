@@ -1,36 +1,28 @@
 import React from "react";
 import * as Tone from "tone/build/esm/index";
 
+import { SOUND_PATHS, gridOptions, steps } from "../lib/constants";
 import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  INSTRUMENT_NAMES,
-  SOUND_PATHS,
-  gridOptions,
-} from "../lib/constants";
-import { Beat, GridOption, StartCoords } from "../types/types";
-
-// const usePreviousTransportPos = (pos: number) => {
-//   const ref = React.useRef<number>(1); // so it doesn't initialize as null, will get reset immediately anyway
-//   React.useEffect(() => {
-//     ref.current = pos;
-//   });
-//   return ref.current;
-// };
+  Beat,
+  GridOption,
+  NoteStates,
+  Players,
+  StartCoords,
+} from "../types/types";
 
 export const useDrumMachine = (
   sequenceRef: React.MutableRefObject<Tone.Sequence | null>,
-  samplerRef: React.MutableRefObject<Tone.Sampler | null>
+  playersRef: React.MutableRefObject<Players | null>
 ) => {
-  const [isLoaded, setLoaded] = React.useState(false);
-  const [transportPos, setTransportPos] = React.useState(0);
+  const [playersAreLoading, setPlayersAreLoading] = React.useState(true);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [beats, setBeats] = React.useState<Array<Beat>>([]);
   const [tempo, setTempo] = React.useState(90);
-  // const [startTime, setStartTime] = React.useState<number | null>(null);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
-
-  // const prevTransportPos = usePreviousTransportPos(transportPos);
+  // const [noteStates, setNoteStates] = React.useState<NoteStates>(
+  //   createNoteStates()
+  // );
+  // const [transportPos, setTransportPos] = React.useState(0);
 
   const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempo(Number(e.target.value));
@@ -47,36 +39,71 @@ export const useDrumMachine = (
   };
 
   React.useEffect(() => {
-    samplerRef.current = new Tone.Sampler({
-      urls: {
-        ["A1"]: "kick.wav",
-        ["B1"]: "chh.wav",
-        ["C1"]: "ohh.wav",
-        ["D1"]: "sd.wav",
-      },
-      baseUrl: "/samples/",
-      onload: () => {
-        setLoaded(true);
-      },
-    }).toDestination();
-  }, [samplerRef]);
+    const loadPlayers = async () => {
+      try {
+        const players = Object.fromEntries(
+          SOUND_PATHS.map((d) => [d.name, new Tone.Player().toDestination()])
+        );
 
-  React.useEffect(() => {
-    const sequence = new Tone.Sequence(
-      (time, note) => {
-        samplerRef.current?.triggerAttackRelease(note, 0.5, time);
-      },
-      ["A1", "B1", "C1", "D1"],
-      "4n"
-    ).start(0);
+        await Promise.all(
+          SOUND_PATHS.map(async (config) => {
+            const player = players[config.name];
+            await player.load(config.url);
+          })
+        );
 
-    sequenceRef.current = sequence;
+        playersRef.current = players;
+        setPlayersAreLoading(false);
+      } catch (err) {
+        console.log(err);
+        setPlayersAreLoading(false);
+      }
+    };
+
+    loadPlayers();
 
     return () => {
-      sequence.stop();
-      sequence.dispose();
+      if (playersRef.current) {
+        Object.values(playersRef.current).forEach((player) => {
+          if (player) {
+            player.dispose();
+          }
+        });
+      }
     };
-  }, [samplerRef, sequenceRef]);
+  }, [playersRef]);
+
+  React.useEffect(() => {
+    if (isPlaying) {
+      sequenceRef.current = new Tone.Sequence(
+        (time, step) => {
+          // Object.entries(noteStates).forEach(([inst, notes]) => {
+          //   if (notes[step]) {
+          //     players[inst].start(time);
+          //   }
+          // });
+          // setTransportLocation(step);
+        },
+        Array(steps)
+          .fill(0)
+          .map((_, index) => index),
+        `${steps}n`
+      );
+    }
+
+    const handleStartStop = async () => {
+      await Tone.loaded();
+      if (sequenceRef.current && isPlaying) {
+        sequenceRef.current.start(0);
+      }
+    };
+
+    handleStartStop();
+
+    return () => {
+      sequenceRef.current?.dispose();
+    };
+  }, [isPlaying, sequenceRef, tempo]);
 
   const handleUpdateStartCoords = (
     beatId: string,
@@ -103,25 +130,21 @@ export const useDrumMachine = (
     Tone.Transport.bpm.value = tempo;
   }, [tempo]);
 
-  const handleTogglePlaying = React.useCallback(() => {
-    const togglePlay = async () => {
-      if (Tone.context.state !== "running") {
-        await Tone.start();
+  const handleTogglePlaying = async () => {
+    if (Tone.context.state !== "running") {
+      await Tone.start();
+    }
+
+    setIsPlaying((prevIsPlaying) => {
+      if (!prevIsPlaying) {
+        Tone.Transport.start();
+      } else {
+        Tone.Transport.stop();
       }
 
-      setIsPlaying((prevIsPlaying) => {
-        if (!prevIsPlaying) {
-          Tone.Transport.start();
-        } else {
-          Tone.Transport.stop();
-        }
-
-        return !prevIsPlaying;
-      });
-    };
-
-    togglePlay();
-  }, []);
+      return !prevIsPlaying;
+    });
+  };
 
   React.useEffect(() => {
     const playViaSpacebar = (event: KeyboardEvent) => {
@@ -137,36 +160,14 @@ export const useDrumMachine = (
     };
   });
 
-  React.useEffect(() => {
-    Tone.Transport.schedule((time) => {
-      Tone.Draw.schedule(() => {
-        console.log(time);
-        setTransportPos(time);
-      }, time);
-    }, "+0.5");
-  });
-
   // React.useEffect(() => {
-  //   if (isPlaying) {
-  //     const beatsToPlay = beats.filter((beat) =>
-  //       transportPos < prevTransportPos
-  //         ? beat.startCoords.x <= transportPos
-  //         : prevTransportPos <= beat.startCoords.x &&
-  //           beat.startCoords.x <= transportPos
-  //     );
-
-  //     // beatsToPlay.forEach((beat) => {
-  //     // const name =
-  //     //   INSTRUMENT_NAMES[
-  //     //     INSTRUMENT_NAMES.length * (beat.startCoords.y / GRID_HEIGHT)
-  //     //   ];
-
-  //     // samples.forEach((sample) => {
-  //     //   sample.sampler.triggerAttack("C2", Tone.now());
-  //     // });
-  //     // });
-  //   }
-  // }, [isPlaying, prevTransportPos, beats, transportPos, sequenceRef]);
+  //   Tone.Transport.schedule((time) => {
+  //     Tone.Draw.schedule(() => {
+  //       console.log(time);
+  //       // setTransportPos(time);
+  //     }, time);
+  //   }, "+0.5");
+  // });
 
   return {
     beats,
@@ -175,11 +176,11 @@ export const useDrumMachine = (
     handleDeleteBeat,
     handleTogglePlaying,
     handleUpdateStartCoords,
-    isLoaded,
+    playersAreLoading,
     isPlaying,
     onChangeTempo,
     setGridView,
     tempo,
-    transportPos,
+    // transportPos,
   };
 };
