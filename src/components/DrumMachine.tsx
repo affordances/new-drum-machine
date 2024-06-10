@@ -11,6 +11,7 @@ import {
   GRID_HEIGHT,
   GRID_WIDTH,
   INSTRUMENT_NAMES,
+  STEPS,
 } from "../lib/constants";
 import { beatHeight, getStartCoords } from "../lib/helpers";
 import { useDrumMachine } from "../hooks/hooks";
@@ -35,13 +36,11 @@ export const DrumMachine = () => {
     onChangeTempo,
     setGridView,
     tempo,
-    // transportPos,
+    transportPos,
   } = useDrumMachine(sequenceRef, playersRef);
 
   const subdivisions = gridView.value;
   const currentBeatWidth = GRID_WIDTH / subdivisions;
-
-  console.log(beats);
 
   return (
     <S.Container>
@@ -196,13 +195,18 @@ export const DrumMachine = () => {
               </K.Group>
             );
           })}
-          {/* {isPlaying && (
+          {isPlaying && (
             <K.Line
-              points={[transportPos, 0, transportPos, GRID_HEIGHT]}
+              points={[
+                (GRID_WIDTH / STEPS) * transportPos,
+                0,
+                (GRID_WIDTH / STEPS) * transportPos,
+                GRID_HEIGHT,
+              ]}
               strokeWidth={2}
               stroke="red"
             />
-          )} */}
+          )}
         </K.Layer>
       </K.Stage>
       <S.MenuContainer>

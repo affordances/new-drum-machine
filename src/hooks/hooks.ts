@@ -1,7 +1,7 @@
 import React from "react";
 import * as Tone from "tone/build/esm/index";
 
-import { SOUND_PATHS, gridOptions, steps } from "../lib/constants";
+import { SOUND_PATHS, gridOptions, STEPS } from "../lib/constants";
 import {
   Beat,
   GridOption,
@@ -19,10 +19,10 @@ export const useDrumMachine = (
   const [beats, setBeats] = React.useState<Array<Beat>>([]);
   const [tempo, setTempo] = React.useState(90);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
+  const [transportPos, setTransportPos] = React.useState(0);
   // const [noteStates, setNoteStates] = React.useState<NoteStates>(
   //   createNoteStates()
   // );
-  // const [transportPos, setTransportPos] = React.useState(0);
 
   const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempo(Number(e.target.value));
@@ -77,17 +77,12 @@ export const useDrumMachine = (
     if (isPlaying) {
       sequenceRef.current = new Tone.Sequence(
         (time, step) => {
-          // Object.entries(noteStates).forEach(([inst, notes]) => {
-          //   if (notes[step]) {
-          //     players[inst].start(time);
-          //   }
-          // });
-          // setTransportLocation(step);
+          setTransportPos(step);
         },
-        Array(steps)
-          .fill(0)
+        Array(STEPS)
+          .fill(1)
           .map((_, index) => index),
-        `${steps}n`
+        `${STEPS}n`
       );
     }
 
@@ -127,19 +122,19 @@ export const useDrumMachine = (
   };
 
   React.useEffect(() => {
-    Tone.Transport.bpm.value = tempo;
+    Tone.getTransport().bpm.value = tempo;
   }, [tempo]);
 
   const handleTogglePlaying = async () => {
-    if (Tone.context.state !== "running") {
+    if (Tone.getContext().state !== "running") {
       await Tone.start();
     }
 
     setIsPlaying((prevIsPlaying) => {
       if (!prevIsPlaying) {
-        Tone.Transport.start();
+        Tone.getTransport().start();
       } else {
-        Tone.Transport.stop();
+        Tone.getTransport().stop();
       }
 
       return !prevIsPlaying;
@@ -160,15 +155,6 @@ export const useDrumMachine = (
     };
   });
 
-  // React.useEffect(() => {
-  //   Tone.Transport.schedule((time) => {
-  //     Tone.Draw.schedule(() => {
-  //       console.log(time);
-  //       // setTransportPos(time);
-  //     }, time);
-  //   }, "+0.5");
-  // });
-
   return {
     beats,
     gridView,
@@ -181,6 +167,6 @@ export const useDrumMachine = (
     onChangeTempo,
     setGridView,
     tempo,
-    // transportPos,
+    transportPos,
   };
 };

@@ -1,10 +1,8 @@
 import { GridOption, Urls } from "../types/types";
 
-export const steps = 16;
-
-export const GRID_WIDTH: number = 768;
-export const GRID_HEIGHT: number = 192;
-// export const MAX_SUBDIVISIONS: number = 192;
+export const STEPS = 192;
+export const GRID_WIDTH = 768;
+export const GRID_HEIGHT = 192;
 
 export const SOUND_PATHS: Urls = [
   { name: "open hat", url: "./samples/ohh.wav" },
