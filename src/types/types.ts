@@ -1,7 +1,5 @@
 import * as Tone from "tone/build/esm/index";
 
-export type Nil = null | undefined;
-
 export type StartCoords = {
   x: number;
   y: number;

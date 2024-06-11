@@ -94,9 +94,7 @@ export const useDrumMachine = (
           });
           setTransportPos(step);
         },
-        Array(STEPS)
-          .fill(1)
-          .map((_, index) => index),
+        Array.from({ length: STEPS }, (_, i) => i),
         `${STEPS}n`
       );
     }
@@ -115,7 +113,7 @@ export const useDrumMachine = (
     return () => {
       sequenceRef.current?.dispose();
     };
-  }, [isPlaying, sequenceRef, tempo]);
+  }, [isPlaying, noteStates, playersRef, sequenceRef, tempo]);
 
   const handleUpdateStartCoords = (
     beatId: string,

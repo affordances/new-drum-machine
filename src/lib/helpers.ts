@@ -10,14 +10,7 @@ import {
   STEPS,
   gridOptions,
 } from "./constants";
-import { Beat, Nil, NoteStates } from "../types/types";
-
-const isNull = (x: unknown): x is null => x === null;
-const isUndefined = (x: unknown): x is undefined => x === undefined;
-const isNil = (x: unknown): x is Nil => isNull(x) || isUndefined(x);
-export const isNotNil = <T>(x: T | Nil): x is T => !isNil(x);
-
-export const beatHeight = GRID_HEIGHT / INSTRUMENT_NAMES.length;
+import { Beat, NoteStates } from "../types/types";
 
 const getXStartCoordinate = (
   cnvsWidth: number,

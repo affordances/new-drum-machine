@@ -12,8 +12,9 @@ import {
   GRID_WIDTH,
   INSTRUMENT_NAMES,
   STEP_LENGTH,
+  ROW_HEIGHT,
 } from "../lib/constants";
-import { beatHeight, getStartCoords } from "../lib/helpers";
+import { getStartCoords } from "../lib/helpers";
 import { useDrumMachine } from "../hooks/hooks";
 import * as S from "../styles/styles";
 import { GridOption, Players } from "../types/types";
@@ -96,14 +97,14 @@ export const DrumMachine = () => {
             .map((_, i) => (
               <K.Line
                 key={i}
-                points={[0, i * beatHeight, GRID_WIDTH, i * beatHeight]}
+                points={[0, i * ROW_HEIGHT, GRID_WIDTH, i * ROW_HEIGHT]}
                 stroke="black"
                 strokeWidth={1}
               />
             ))}
           {beats.map((b, i) => {
             const xDragLimit = GRID_WIDTH - b.extends;
-            const yDragLimit = GRID_HEIGHT - beatHeight;
+            const yDragLimit = GRID_HEIGHT - ROW_HEIGHT;
 
             return (
               <K.Group
@@ -145,7 +146,7 @@ export const DrumMachine = () => {
 
                   const newStartCoords = {
                     x,
-                    y: Math.round(e.target.y() / beatHeight) * beatHeight,
+                    y: Math.round(e.target.y() / ROW_HEIGHT) * ROW_HEIGHT,
                   };
 
                   // konva updates before app state
@@ -176,7 +177,7 @@ export const DrumMachine = () => {
               >
                 <K.Rect
                   width={b.extends}
-                  height={beatHeight}
+                  height={ROW_HEIGHT}
                   fill="green"
                   shadowColor="black"
                   stroke="white"
