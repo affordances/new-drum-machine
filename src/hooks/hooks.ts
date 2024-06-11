@@ -13,6 +13,7 @@ import {
   getInstrumentName,
   initializeBeats,
   initializeNoteStates,
+  toggleNoteState,
 } from "@/lib/helpers";
 
 export const useDrumMachine = (
@@ -32,21 +33,6 @@ export const useDrumMachine = (
   // beats and noteStates are separate for two reasons:
   // 1) to work with Tone.Sequence, each noteState has to be an array of bools of length STEPS
   // 2) trying to map over those in the render would involve a lot of misdirection
-
-  const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTempo(Number(e.target.value));
-  };
-
-  const handleAddBeat = (beat: Beat) => {
-    console.log(getInstrumentName(beat.startCoords.y));
-    setBeats((prevBeats) => prevBeats.concat(beat));
-  };
-
-  const handleDeleteBeat = (beatId: string) => {
-    setBeats((prevBeats) =>
-      prevBeats.filter((beatToCheck) => beatId !== beatToCheck.id)
-    );
-  };
 
   React.useEffect(() => {
     const loadPlayers = async () => {
@@ -115,17 +101,6 @@ export const useDrumMachine = (
     };
   }, [isPlaying, noteStates, playersRef, sequenceRef, tempo]);
 
-  const handleUpdateStartCoords = (
-    beatId: string,
-    newStartCoords: StartCoords
-  ) => {
-    setBeats((prevBeats) => {
-      return prevBeats.map((beat) =>
-        beat.id === beatId ? { ...beat, startCoords: newStartCoords } : beat
-      );
-    });
-  };
-
   React.useEffect(() => {
     Tone.getTransport().bpm.value = tempo;
   }, [tempo]);
@@ -160,16 +135,48 @@ export const useDrumMachine = (
     };
   });
 
+  const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempo(Number(e.target.value));
+  };
+
+  const handleAddBeat = (beat: Beat) => {
+    setBeats((prevBeats) => prevBeats.concat(beat));
+    setNoteStates((prevObject) =>
+      toggleNoteState(beat.startCoords, prevObject)
+    );
+  };
+
+  const handleDeleteBeat = (beat: Beat) => {
+    setBeats((prevBeats) =>
+      prevBeats.filter((beatToCheck) => beat.id !== beatToCheck.id)
+    );
+    setNoteStates((prevObject) =>
+      toggleNoteState(beat.startCoords, prevObject)
+    );
+  };
+
+  const handleMoveBeat = (beat: Beat, newStartCoords: StartCoords) => {
+    setBeats((prevBeats) =>
+      prevBeats.map((b) =>
+        b.id === beat.id ? { ...b, startCoords: newStartCoords } : b
+      )
+    );
+    setNoteStates((prevObject) => {
+      const withToggledOrigin = toggleNoteState(beat.startCoords, prevObject);
+      return toggleNoteState(newStartCoords, withToggledOrigin);
+    });
+  };
+
   return {
     beats,
     gridView,
     handleAddBeat,
     handleDeleteBeat,
+    handleMoveBeat,
     handleTogglePlaying,
-    handleUpdateStartCoords,
-    playersAreLoading,
     isPlaying,
     onChangeTempo,
+    playersAreLoading,
     setGridView,
     tempo,
     transportPos,

@@ -10,7 +10,7 @@ import {
   STEPS,
   gridOptions,
 } from "./constants";
-import { Beat, NoteStates } from "../types/types";
+import { Beat, NoteStates, StartCoords } from "../types/types";
 
 const getXStartCoordinate = (
   cnvsWidth: number,
@@ -29,10 +29,25 @@ export const getInstrumentName = (yCoord: number) => {
 export const getStartCoords = (
   e: KonvaEventObject<MouseEvent>,
   subdivisions: number
-) => {
+): StartCoords => {
   const x = getXStartCoordinate(GRID_WIDTH, e.evt.clientX - 24, subdivisions);
   const y = getYStartCoordinate(e.evt.clientY - 24);
   return { x, y };
+};
+
+export const toggleNoteState = (
+  startCoords: StartCoords,
+  prevObject: NoteStates
+): NoteStates => {
+  const instrument = getInstrumentName(startCoords.y);
+  const noteStateIndex = startCoords.x / 4;
+
+  return {
+    ...prevObject,
+    [instrument]: prevObject[instrument].map((state, index) =>
+      index === noteStateIndex ? !state : state
+    ),
+  };
 };
 
 export const initializeBeats = (): Array<Beat> => {
@@ -43,6 +58,7 @@ export const initializeBeats = (): Array<Beat> => {
   return Array.from({ length: initialBeatCount }, (_, i) => {
     const startX = i * (GRID_WIDTH / 4);
     const startY = GRID_HEIGHT - ROW_HEIGHT;
+    // we take for granted that the kick will always be the bottom row
 
     return {
       id: uuidv4(),

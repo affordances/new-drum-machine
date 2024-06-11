@@ -30,11 +30,11 @@ export const DrumMachine = () => {
     gridView,
     handleAddBeat,
     handleDeleteBeat,
+    handleMoveBeat,
     handleTogglePlaying,
-    handleUpdateStartCoords,
-    playersAreLoading,
     isPlaying,
     onChangeTempo,
+    playersAreLoading,
     setGridView,
     tempo,
     transportPos,
@@ -153,13 +153,13 @@ export const DrumMachine = () => {
                   e.target.x(newStartCoords.x);
                   e.target.y(newStartCoords.y);
 
-                  handleUpdateStartCoords(b.id, newStartCoords);
+                  handleMoveBeat(b, newStartCoords);
                 }}
                 onMouseDown={(e) => {
                   e.cancelBubble = true;
                   if (e.evt.shiftKey) {
                     setCursorIsPointer(e.evt.shiftKey);
-                    handleDeleteBeat(b.id);
+                    handleDeleteBeat(b);
                   } else if (e.evt.metaKey) {
                     setCursorIsPointer(e.evt.metaKey);
                     const startCoords = getStartCoords(e, subdivisions);
