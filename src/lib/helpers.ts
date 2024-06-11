@@ -1,6 +1,12 @@
 import { KonvaEventObject } from "konva/lib/Node";
 
-import { GRID_HEIGHT, GRID_WIDTH, INSTRUMENT_NAMES } from "./constants";
+import {
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  INSTRUMENT_NAMES,
+  SOUND_PATHS,
+  STEPS,
+} from "./constants";
 import { Nil, NoteStates, Urls } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
@@ -16,9 +22,13 @@ const getXStartCoordinate = (
   subdivisions: number
 ) => clicked - (clicked % (cnvsWidth / subdivisions));
 
-const getYStartCoordinate = (clicked: number, cnvsHeight: number) => {
-  const rowHeight = cnvsHeight / 4;
+const getYStartCoordinate = (clicked: number) => {
+  const rowHeight = GRID_HEIGHT / 4;
   return clicked - (clicked % rowHeight);
+};
+
+export const getInstrumentName = (yCoord: number) => {
+  return SOUND_PATHS[yCoord / (GRID_HEIGHT / 4)].name;
 };
 
 export const getStartCoords = (
@@ -26,25 +36,25 @@ export const getStartCoords = (
   subdivisions: number
 ) => {
   const x = getXStartCoordinate(GRID_WIDTH, e.evt.clientX - 24, subdivisions);
-  const y = getYStartCoordinate(e.evt.clientY - 24, GRID_HEIGHT);
+  const y = getYStartCoordinate(e.evt.clientY - 24);
   return { x, y };
 };
 
-export const createNoteStates = (steps: number, drumUrls: Urls) => {
-  const createFalseArray = (): boolean[] => new Array(steps).fill(false);
+export const initializeBeats = () => {
+  return [];
+};
+
+export const initializeNoteStates = () => {
+  const createFalseArray = (): boolean[] => Array(STEPS).fill(false);
 
   const createKickArray = (): boolean[] => {
-    const arr = new Array(steps).fill(false);
-    [0, 4, 8, 12].forEach((index) => {
-      arr[index] = true;
-    });
-    return arr;
+    return Array.from({ length: STEPS }, (_, i) => i % (STEPS / 4) === 0);
   };
 
   const newNoteStates: NoteStates = {};
 
-  for (const d of drumUrls) {
-    if (d.name === "kick") {
+  for (const d of SOUND_PATHS) {
+    if (d.name === SOUND_PATHS[3].name) {
       newNoteStates[d.name] = createKickArray();
     } else {
       newNoteStates[d.name] = createFalseArray();

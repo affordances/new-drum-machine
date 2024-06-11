@@ -3,6 +3,7 @@ import { GridOption, Urls } from "../types/types";
 export const STEPS = 192;
 export const GRID_WIDTH = 768;
 export const GRID_HEIGHT = 192;
+export const STEP_LENGTH = GRID_WIDTH / STEPS;
 
 export const SOUND_PATHS: Urls = [
   { name: "open hat", url: "./samples/ohh.wav" },

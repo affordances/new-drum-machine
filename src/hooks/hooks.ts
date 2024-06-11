@@ -9,6 +9,7 @@ import {
   Players,
   StartCoords,
 } from "../types/types";
+import { getInstrumentName, initializeNoteStates } from "@/lib/helpers";
 
 export const useDrumMachine = (
   sequenceRef: React.MutableRefObject<Tone.Sequence | null>,
@@ -16,25 +17,33 @@ export const useDrumMachine = (
 ) => {
   const [playersAreLoading, setPlayersAreLoading] = React.useState(true);
   const [isPlaying, setIsPlaying] = React.useState(false);
-  const [beats, setBeats] = React.useState<Array<Beat>>([]);
   const [tempo, setTempo] = React.useState(90);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
   const [transportPos, setTransportPos] = React.useState(0);
-  // const [noteStates, setNoteStates] = React.useState<NoteStates>(
-  //   createNoteStates()
-  // );
+  const [beats, setBeats] = React.useState<Array<Beat>>([]);
+  const [noteStates, setNoteStates] = React.useState<NoteStates>(
+    initializeNoteStates()
+  );
+
+  console.log(beats);
+
+  // beats are separate from noteStates because noteStates has to be
+  // bool arrays with the same length as STEPS in order to work with
+  // Tone.Sequence, and trying to map over those in the render would
+  // be a lot of misdirection
 
   const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempo(Number(e.target.value));
   };
 
   const handleAddBeat = (beat: Beat) => {
-    setBeats((beats) => beats.concat(beat));
+    console.log(getInstrumentName(beat.startCoords.y));
+    setBeats((prevBeats) => prevBeats.concat(beat));
   };
 
   const handleDeleteBeat = (beatId: string) => {
-    setBeats((beats) =>
-      beats.filter((beatToCheck) => beatId !== beatToCheck.id)
+    setBeats((prevBeats) =>
+      prevBeats.filter((beatToCheck) => beatId !== beatToCheck.id)
     );
   };
 
@@ -77,6 +86,11 @@ export const useDrumMachine = (
     if (isPlaying) {
       sequenceRef.current = new Tone.Sequence(
         (time, step) => {
+          Object.entries(noteStates).forEach(([inst, notes]) => {
+            if (playersRef.current && notes[step]) {
+              playersRef.current[inst].start(time);
+            }
+          });
           setTransportPos(step);
         },
         Array(STEPS)
@@ -90,6 +104,8 @@ export const useDrumMachine = (
       await Tone.loaded();
       if (sequenceRef.current && isPlaying) {
         sequenceRef.current.start(0);
+      } else {
+        setTransportPos(0);
       }
     };
 
@@ -104,21 +120,11 @@ export const useDrumMachine = (
     beatId: string,
     newStartCoords: StartCoords
   ) => {
-    const beatToUpdate = beats.find((beatToCheck) => beatId === beatToCheck.id);
-
-    if (beatToUpdate) {
-      const updatedBeat = {
-        id: beatToUpdate.id,
-        startCoords: newStartCoords,
-        extends: beatToUpdate.extends,
-      };
-
-      const updatedBeats = beats.map((b) =>
-        b.id === beatId ? updatedBeat : b
+    setBeats((prevBeats) => {
+      return prevBeats.map((beat) =>
+        beat.id === beatId ? { ...beat, startCoords: newStartCoords } : beat
       );
-
-      setBeats(updatedBeats);
-    }
+    });
   };
 
   React.useEffect(() => {

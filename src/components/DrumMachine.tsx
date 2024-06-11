@@ -11,7 +11,7 @@ import {
   GRID_HEIGHT,
   GRID_WIDTH,
   INSTRUMENT_NAMES,
-  STEPS,
+  STEP_LENGTH,
 } from "../lib/constants";
 import { beatHeight, getStartCoords } from "../lib/helpers";
 import { useDrumMachine } from "../hooks/hooks";
@@ -198,9 +198,9 @@ export const DrumMachine = () => {
           {isPlaying && (
             <K.Line
               points={[
-                (GRID_WIDTH / STEPS) * transportPos,
+                STEP_LENGTH * transportPos,
                 0,
-                (GRID_WIDTH / STEPS) * transportPos,
+                STEP_LENGTH * transportPos,
                 GRID_HEIGHT,
               ]}
               strokeWidth={2}
