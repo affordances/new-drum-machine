@@ -1,4 +1,5 @@
 import { KonvaEventObject } from "konva/lib/Node";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   GRID_HEIGHT,
@@ -6,8 +7,9 @@ import {
   INSTRUMENT_NAMES,
   SOUND_PATHS,
   STEPS,
+  gridOptions,
 } from "./constants";
-import { Nil, NoteStates, Urls } from "../types/types";
+import { Beat, Nil, NoteStates, Urls } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
 const isUndefined = (x: unknown): x is undefined => x === undefined;
@@ -40,8 +42,21 @@ export const getStartCoords = (
   return { x, y };
 };
 
-export const initializeBeats = () => {
-  return [];
+export const initializeBeats = (): Array<Beat> => {
+  const { value: gridValue } = gridOptions[2];
+  const initialBeatCount = gridValue / 4;
+  const initialBeatWidth = GRID_WIDTH / gridValue;
+
+  return Array.from({ length: initialBeatCount }, (_, i) => {
+    const startX = i * (GRID_WIDTH / 4);
+    const startY = GRID_HEIGHT - GRID_HEIGHT / 4;
+
+    return {
+      id: uuidv4(),
+      startCoords: { x: startX, y: startY },
+      extends: initialBeatWidth,
+    };
+  });
 };
 
 export const initializeNoteStates = () => {

@@ -9,7 +9,11 @@ import {
   Players,
   StartCoords,
 } from "../types/types";
-import { getInstrumentName, initializeNoteStates } from "@/lib/helpers";
+import {
+  getInstrumentName,
+  initializeBeats,
+  initializeNoteStates,
+} from "@/lib/helpers";
 
 export const useDrumMachine = (
   sequenceRef: React.MutableRefObject<Tone.Sequence | null>,
@@ -20,12 +24,10 @@ export const useDrumMachine = (
   const [tempo, setTempo] = React.useState(90);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
   const [transportPos, setTransportPos] = React.useState(0);
-  const [beats, setBeats] = React.useState<Array<Beat>>([]);
+  const [beats, setBeats] = React.useState<Array<Beat>>(initializeBeats());
   const [noteStates, setNoteStates] = React.useState<NoteStates>(
     initializeNoteStates()
   );
-
-  console.log(beats);
 
   // beats are separate from noteStates because noteStates has to be
   // bool arrays with the same length as STEPS in order to work with
