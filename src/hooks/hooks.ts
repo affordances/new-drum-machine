@@ -29,10 +29,9 @@ export const useDrumMachine = (
     initializeNoteStates()
   );
 
-  // beats are separate from noteStates because noteStates has to be
-  // bool arrays with the same length as STEPS in order to work with
-  // Tone.Sequence, and trying to map over those in the render would
-  // be a lot of misdirection
+  // beats and noteStates are separate for two reasons:
+  // 1) to work with Tone.Sequence, each noteState has to be an array of bools of length STEPS
+  // 2) trying to map over those in the render would involve a lot of misdirection
 
   const onChangeTempo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempo(Number(e.target.value));

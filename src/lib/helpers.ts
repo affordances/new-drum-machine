@@ -5,11 +5,12 @@ import {
   GRID_HEIGHT,
   GRID_WIDTH,
   INSTRUMENT_NAMES,
+  ROW_HEIGHT,
   SOUND_PATHS,
   STEPS,
   gridOptions,
 } from "./constants";
-import { Beat, Nil, NoteStates, Urls } from "../types/types";
+import { Beat, Nil, NoteStates } from "../types/types";
 
 const isNull = (x: unknown): x is null => x === null;
 const isUndefined = (x: unknown): x is undefined => x === undefined;
@@ -25,12 +26,11 @@ const getXStartCoordinate = (
 ) => clicked - (clicked % (cnvsWidth / subdivisions));
 
 const getYStartCoordinate = (clicked: number) => {
-  const rowHeight = GRID_HEIGHT / 4;
-  return clicked - (clicked % rowHeight);
+  return clicked - (clicked % ROW_HEIGHT);
 };
 
 export const getInstrumentName = (yCoord: number) => {
-  return SOUND_PATHS[yCoord / (GRID_HEIGHT / 4)].name;
+  return INSTRUMENT_NAMES[yCoord / ROW_HEIGHT];
 };
 
 export const getStartCoords = (
@@ -49,7 +49,7 @@ export const initializeBeats = (): Array<Beat> => {
 
   return Array.from({ length: initialBeatCount }, (_, i) => {
     const startX = i * (GRID_WIDTH / 4);
-    const startY = GRID_HEIGHT - GRID_HEIGHT / 4;
+    const startY = GRID_HEIGHT - ROW_HEIGHT;
 
     return {
       id: uuidv4(),
