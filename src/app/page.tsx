@@ -5,7 +5,7 @@ const NoSSRComponent = dynamic(() => import("../components/DrumMachine"), {
 });
 
 export const metadata = {
-  title: "Drum Machine",
+  title: "ReDrummer",
 };
 
 export default function Home() {
