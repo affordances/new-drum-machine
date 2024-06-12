@@ -10,7 +10,6 @@ import {
   StartCoords,
 } from "../types/types";
 import {
-  getInstrumentName,
   initializeBeats,
   initializeNoteStates,
   toggleNoteState,
@@ -22,9 +21,10 @@ export const useDrumMachine = (
 ) => {
   const [playersAreLoading, setPlayersAreLoading] = React.useState(true);
   const [isPlaying, setIsPlaying] = React.useState(false);
-  const [tempo, setTempo] = React.useState(90);
+  const [tempo, setTempo] = React.useState(130);
   const [gridView, setGridView] = React.useState<GridOption>(gridOptions[2]);
   const [transportPos, setTransportPos] = React.useState(0);
+  const [selectedBeats, setSelectedBeats] = React.useState<Array<Beat>>([]);
   const [beats, setBeats] = React.useState<Array<Beat>>(initializeBeats());
   const [noteStates, setNoteStates] = React.useState<NoteStates>(
     initializeNoteStates()
@@ -122,16 +122,26 @@ export const useDrumMachine = (
   };
 
   React.useEffect(() => {
-    const playViaSpacebar = (event: KeyboardEvent) => {
-      if (event.key === " ") {
+    const playViaSpacebar = (e: KeyboardEvent) => {
+      if (e.key === " ") {
+        e.preventDefault();
         handleTogglePlaying();
       }
     };
 
+    const deleteSelected = (e: KeyboardEvent) => {
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        handleDeleteSelectBeats();
+      }
+    };
+
     document.addEventListener("keydown", playViaSpacebar);
+    document.addEventListener("keydown", deleteSelected);
 
     return () => {
       document.removeEventListener("keydown", playViaSpacebar);
+      document.removeEventListener("keydown", deleteSelected);
     };
   });
 
@@ -141,15 +151,6 @@ export const useDrumMachine = (
 
   const handleAddBeat = (beat: Beat) => {
     setBeats((prevBeats) => prevBeats.concat(beat));
-    setNoteStates((prevObject) =>
-      toggleNoteState(beat.startCoords, prevObject)
-    );
-  };
-
-  const handleDeleteBeat = (beat: Beat) => {
-    setBeats((prevBeats) =>
-      prevBeats.filter((beatToCheck) => beat.id !== beatToCheck.id)
-    );
     setNoteStates((prevObject) =>
       toggleNoteState(beat.startCoords, prevObject)
     );
@@ -167,18 +168,51 @@ export const useDrumMachine = (
     });
   };
 
+  const toggleSelectedBeat = (beat: Beat) => {
+    setSelectedBeats((prevBeats) => {
+      const isBeatSelected = prevBeats.some(
+        (selectedBeat) => selectedBeat.id === beat.id
+      );
+
+      if (isBeatSelected) {
+        return prevBeats.filter((selectedBeat) => selectedBeat.id !== beat.id);
+      } else {
+        return [...prevBeats, beat];
+      }
+    });
+  };
+
+  const handleDeleteSelectBeats = () => {
+    const beatsToDeleteIds = new Set(selectedBeats.map((beat) => beat.id));
+
+    setBeats((prevBeats) =>
+      prevBeats.filter((beat) => !beatsToDeleteIds.has(beat.id))
+    );
+
+    setNoteStates((prevObject) =>
+      selectedBeats.reduce(
+        (updatedObject, beat) =>
+          toggleNoteState(beat.startCoords, updatedObject),
+        { ...prevObject }
+      )
+    );
+
+    setSelectedBeats([]);
+  };
+
   return {
     beats,
     gridView,
     handleAddBeat,
-    handleDeleteBeat,
     handleMoveBeat,
     handleTogglePlaying,
     isPlaying,
     onChangeTempo,
     playersAreLoading,
+    selectedBeats,
     setGridView,
     tempo,
+    toggleSelectedBeat,
     transportPos,
   };
 };

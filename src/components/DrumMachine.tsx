@@ -29,14 +29,15 @@ export const DrumMachine = () => {
     beats,
     gridView,
     handleAddBeat,
-    handleDeleteBeat,
     handleMoveBeat,
     handleTogglePlaying,
     isPlaying,
     onChangeTempo,
     playersAreLoading,
+    selectedBeats,
     setGridView,
     tempo,
+    toggleSelectedBeat,
     transportPos,
   } = useDrumMachine(sequenceRef, playersRef);
 
@@ -64,10 +65,6 @@ export const DrumMachine = () => {
               extends: GRID_WIDTH / subdivisions,
             });
           }
-        }}
-        onMouseUp={(e) => {
-          e.cancelBubble = true;
-          setCursorIsPointer(false);
         }}
       >
         <K.Layer x={0} y={0}>
@@ -105,6 +102,7 @@ export const DrumMachine = () => {
           {beats.map((b, i) => {
             const xDragLimit = GRID_WIDTH - b.extends;
             const yDragLimit = GRID_HEIGHT - ROW_HEIGHT;
+            const isSelected = selectedBeats.some((b2) => b2.id === b.id);
 
             return (
               <K.Group
@@ -116,6 +114,9 @@ export const DrumMachine = () => {
                   e.cancelBubble = true;
                   setCursorIsPointer(true);
                 }}
+                onMouseOver={() => setCursorIsPointer(true)}
+                onMouseLeave={() => setCursorIsPointer(false)}
+                onClick={() => toggleSelectedBeat(b)}
                 onDragMove={(e) => {
                   e.target.x(
                     e.target.x() > xDragLimit
@@ -135,7 +136,6 @@ export const DrumMachine = () => {
                 }}
                 onDragEnd={(e) => {
                   e.cancelBubble = true;
-                  setCursorIsPointer(false);
 
                   const maybeX =
                     Math.round(e.target.x() / currentBeatWidth) *
@@ -157,10 +157,7 @@ export const DrumMachine = () => {
                 }}
                 onMouseDown={(e) => {
                   e.cancelBubble = true;
-                  if (e.evt.shiftKey) {
-                    setCursorIsPointer(e.evt.shiftKey);
-                    handleDeleteBeat(b);
-                  } else if (e.evt.metaKey) {
+                  if (e.evt.metaKey) {
                     setCursorIsPointer(e.evt.metaKey);
                     const startCoords = getStartCoords(e, subdivisions);
                     handleAddBeat({
@@ -170,15 +167,11 @@ export const DrumMachine = () => {
                     });
                   }
                 }}
-                onMouseUp={(e) => {
-                  e.cancelBubble = true;
-                  setCursorIsPointer(false);
-                }}
               >
                 <K.Rect
                   width={b.extends}
                   height={ROW_HEIGHT}
-                  fill="green"
+                  fill={isSelected ? "lightgreen" : "green"}
                   shadowColor="black"
                   stroke="white"
                   shadowBlur={2}
@@ -227,9 +220,9 @@ export const DrumMachine = () => {
           value={gridView}
           onChange={(newGridView) => setGridView(newGridView as GridOption)}
         />
-        <S.Text>command click to add</S.Text>
-        <S.Text>shift click to remove</S.Text>
-        <S.Text>click to drag</S.Text>
+        <S.Text>command click to add beat</S.Text>
+        <S.Text>select to delete beat</S.Text>
+        <S.Text>click to drag beat</S.Text>
       </S.MenuContainer>
     </S.Container>
   );
