@@ -16,12 +16,12 @@ export const SOUND_PATHS: Urls = [
 export const INSTRUMENT_NAMES: Array<string> = SOUND_PATHS.map((p) => p.name);
 
 export const gridOptions: Array<GridOption> = [
-  { value: 4, label: "1/4 Note" },
-  { value: 8, label: "1/8 Note" },
-  { value: 16, label: "1/16 Note" },
-  { value: 6, label: "1/4 Triplets" },
-  { value: 12, label: "1/8 Triplets" },
-  { value: 24, label: "1/16 Triplets" },
+  { value: 4, label: "1/4 note" },
+  { value: 8, label: "1/8 note" },
+  { value: 16, label: "1/16 note" },
+  { value: 6, label: "1/4 triplets" },
+  { value: 12, label: "1/8 triplets" },
+  { value: 24, label: "1/16 triplets" },
 ];
 
 // 1/4

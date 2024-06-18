@@ -30,8 +30,8 @@ export const getStartCoords = (
   e: KonvaEventObject<MouseEvent>,
   subdivisions: number
 ): StartCoords => {
-  const x = getXStartCoordinate(GRID_WIDTH, e.evt.clientX - 24, subdivisions);
-  const y = getYStartCoordinate(e.evt.clientY - 24);
+  const x = getXStartCoordinate(GRID_WIDTH, e.evt.layerX, subdivisions);
+  const y = getYStartCoordinate(e.evt.layerY);
   return { x, y };
 };
 

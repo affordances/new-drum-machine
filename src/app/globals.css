@@ -4,8 +4,9 @@
   margin: 0;
 }
 
-/* html,
+html,
 body {
+  background-color: lightgray;
+  max-height: 100vh;
   max-width: 100vw;
-  overflow-x: hidden;
-} */
+}
