@@ -23,26 +23,3 @@ export const gridOptions: Array<GridOption> = [
   { value: 12, label: "1/8 triplets" },
   { value: 24, label: "1/16 triplets" },
 ];
-
-// 1/4
-// bright: 4
-
-// 1/8
-// dim: 8
-// bright: 4
-
-// 1/16
-// dim: 16
-// bright: 4
-
-// 1/4 triplets
-// dim: 6
-// bright: 4
-
-// 1/8 triplets
-// dim: 12
-// bright: 4
-
-// 1/16 triplets
-// dim: 24
-// bright: 4

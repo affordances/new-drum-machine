@@ -122,6 +122,9 @@ export const StyledSelect = styled.select`
 
   -webkit-appearance: none;
   -moz-appearance: none;
+
+  // for safari
+  text-align-last: center;
 `;
 
 export const Directions = styled.div`
