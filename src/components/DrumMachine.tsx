@@ -18,7 +18,7 @@ import { useDrumMachine } from "../hooks/hooks";
 import * as S from "../styles/styles";
 import { GridOption, Players } from "../types/types";
 import { Select } from "./Select";
-import { Snare } from "./Snare";
+import { ClosedHatIcon, OpenHat, SnareIcon, KickIcon } from "./Icons";
 
 export const DrumMachine = () => {
   const [cursorIsPointer, setCursorIsPointer] = React.useState(false);
@@ -48,15 +48,22 @@ export const DrumMachine = () => {
   return (
     <S.Container>
       <S.Title>reDrummer</S.Title>
+      <S.Subtitle>a polyrhythmic drum machine</S.Subtitle>
       <S.InnerContainer>
-        {/* <S.InstrumentNames>
-          <S.Name></S.Name>
-          <S.Name></S.Name>
+        <S.InstrumentNames>
           <S.Name>
-            <Snare />
+            <OpenHat />
           </S.Name>
-          <S.Name></S.Name>
-        </S.InstrumentNames> */}
+          <S.Name>
+            <ClosedHatIcon />
+          </S.Name>
+          <S.Name>
+            <SnareIcon />
+          </S.Name>
+          <S.Name>
+            <KickIcon />
+          </S.Name>
+        </S.InstrumentNames>
         <S.Staff>
           <K.Stage
             style={{

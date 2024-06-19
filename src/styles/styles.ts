@@ -12,6 +12,13 @@ export const Container = styled.div`
 export const Title = styled.div`
   font-size: 24px;
   letter-spacing: 8px;
+  margin-bottom: 4px;
+`;
+
+export const Subtitle = styled.div`
+  font-size: 18px;
+  font-weight: 200;
+  letter-spacing: 2px;
   margin-bottom: 24px;
 `;
 
