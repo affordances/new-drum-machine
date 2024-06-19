@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Polyrhythmic drumbeat editor",
 };
 
-const inter = Reddit_Mono({ subsets: ["latin"] });
+const font = Reddit_Mono({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -20,7 +20,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/images/icon.ico" sizes="any" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={font.className}>{children}</body>
     </html>
   );
 }
