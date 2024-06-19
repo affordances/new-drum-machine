@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "reDrummer",
-  description: "Polyrhythmic drumbeat editor",
+  description: "a polyrhythmic drum machine",
 };
 
 const font = Reddit_Mono({ subsets: ["latin"] });
